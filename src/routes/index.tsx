@@ -20,6 +20,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  // Strona główna Kawiarni Nocnej
   return (
     <div className="space-y-16">
       <section className="space-y-6">
