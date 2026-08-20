@@ -25,6 +25,9 @@ jobs:
       - name: 🔨 Budowanie aplikacji
         run: npm run build
 
+      - name: 📄 Generowanie pliku index.html
+        run: node scripts/generate-html.js
+
       - name: 🔍 Sprawdzenie folderu wyjściowego
         run: |
           if [ -d ".output/public" ]; then
