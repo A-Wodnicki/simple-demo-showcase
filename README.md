@@ -16,6 +16,16 @@ Ten projekt powstał jako praktyczny test architektury łączącej tworzenie UI 
 
 ---
 
+## 🔄 Test Obejścia Rotacji Workspace'ów (Multi-Workspace Bypass)
+
+W ramach tego projektu przetestowaliśmy i wdrożyliśmy rozwiązanie na znane ograniczenie Lovable (brak możliwości przepięcia pod istniejące repo przy zmianie workspace/konta):
+
+* **Repozytorium Główne (Produkcja)**: `A-Wodnicki/simple-demo-showcase` – posiada skonfigurowane sekrety FTP i automatyczny deploy na Smarthost.
+* **Repozytorium Tymczasowe (Piaskownica Lovable)**: `A-Wodnicki/tiny-showcase` – podpięte pod nowy projekt w Lovable ze świeżą pulą darmowych kredytów AI.
+* **Zasada działania**: Kod synchronizujemy lokalnie w Antigravity za pomocą dodatkowego remote (`temp-lovable`). Dzięki temu **nie trzeba dodawać sekretów ani konfigurować hostingu od nowa** w żadnym nowo tworzonym projekcie Lovable!
+
+---
+
 ## 📖 Pełny Przewodnik Wdrożeniowy (Runbook)
 
 Szczegółowy opis całego procesu, analiza techniczna, rejestr rozwiązanych problemów oraz gotowa instrukcja *Copy-Paste* do wdrożenia w innych projektach znajduje się w pliku:
@@ -28,7 +38,8 @@ Szczegółowy opis całego procesu, analiza techniczna, rejestr rozwiązanych pr
 
 - **Produkcja (Smarthost / Apache)**: [https://adrianlovablehub.smarthost.pl](https://adrianlovablehub.smarthost.pl)
 - **Podgląd Lovable**: [https://adrianlovablehub.lovable.app](https://adrianlovablehub.lovable.app)
-- **Edytor Lovable**: [https://lovable.dev/projects/ad7d0424-b78f-46a3-98d8-6f977dc5c58b](https://lovable.dev/projects/ad7d0424-b78f-46a3-98d8-6f977dc5c58b)
+- **Główne Repozytorium GitHub**: [https://github.com/A-Wodnicki/simple-demo-showcase](https://github.com/A-Wodnicki/simple-demo-showcase)
+- **Tymczasowe Repozytorium Lovable**: [https://github.com/A-Wodnicki/tiny-showcase](https://github.com/A-Wodnicki/tiny-showcase)
 
 ---
 
