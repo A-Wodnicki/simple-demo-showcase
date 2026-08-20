@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="7" fill="#18181b"/>
+  <!-- Cup body -->
+  <path d="M7 13h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5v-6z" fill="#f59e0b"/>
+  <!-- Cup handle -->
+  <path d="M20 14.5h2a2.5 2.5 0 0 1 0 5h-2v-1.8h2a0.7 0.7 0 0 0 0-1.4h-2v-1.8z" fill="#f59e0b"/>
+  <!-- Steam lines -->
+  <path d="M10 6.5c0.8 1.2-0.8 2 0 3.2M13.5 5.5c0.8 1.2-0.8 2 0 3.2M17 6.5c0.8 1.2-0.8 2 0 3.2" stroke="#fbbf24" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  <!-- Crescent moon -->
+  <path d="M26 6.5a3 3 0 0 1-3-3 3.5 3.5 0 1 0 3.8 3.8 3 3 0 0 1-.8-.8z" fill="#fef3c7"/>
+</svg>
