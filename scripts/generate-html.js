@@ -18,9 +18,22 @@ if (fs.existsSync(assetsDir)) {
     <meta name="description" content="Kawiarnia Nocna to mała palarnia specialty w Warszawie. Świeżo palona kawa, sezonowe menu i spokojne miejsce do pracy." />
     <link rel="icon" href="/favicon.ico" />
     ${cssFile ? `<link rel="stylesheet" href="/assets/${cssFile}">` : ''}
+    <script>
+      window.$_TSR = {
+        buffer: [],
+        initialized: false,
+        router: {
+          matches: [
+            { i: '__root__', s: 'success', ssr: false }
+          ],
+          lastMatchId: null,
+          manifest: {},
+          dehydratedData: {}
+        }
+      };
+    </script>
   </head>
   <body>
-    <div id="root"></div>
     ${jsFile ? `<script type="module" src="/assets/${jsFile}"></script>` : ''}
   </body>
 </html>`;
