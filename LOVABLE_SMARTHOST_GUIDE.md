@@ -14,9 +14,9 @@
 ```
 
 1. **Lovable**: Narzędzie do szybkiego prototypowania i edycji UI za pomocą promptów AI.
-2. **GitHub**: Centralne repozytorium kodu łączące wszystkie narzędzia.
-3. **Antigravity (Google AGY)**: Zaawansowany lokalny asystent AI i środowisko programistyczne pracujące na pełnym kodzie źródłowym.
-4. **GitHub Actions + FTP**: Automatyczny proces (CI/CD), który po każdym commicie buduje stronę i wgrywa gotowe pliki na serwer Smarthost.
+2. **GitHub**: Centralne repozytorium kodu łączące wszystkie narzędzia (Single Source of Truth).
+3. **Antigravity (Google AGY)**: Lokalny agent programistyczny pracujący bezpośrednio na kodzie źródłowym.
+4. **GitHub Actions + FTP**: Automatyczny proces (CI/CD), który po każdym commicie buduje stronę z pre-renderingiem SSR i wgrywa gotowe pliki na serwer Smarthost.
 
 ---
 
@@ -26,7 +26,7 @@
 | :--- | :--- | :--- |
 | **Typ aplikacji** | SSR (Server-Side Rendering) pod chmurę (Nitro / Cloudflare Workers) | Statyczny serwer plików WWW (Apache / LiteSpeed) |
 | **Generowanie HTML** | Serwer Node.js / Worker w chmurze generuje HTML w locie dla każdego zapytania | Serwer oczekuje fizycznego pliku `index.html` w katalogu `public_html` |
-| **Hydracja Reacta** | Serwer backendowy wstrzykuje do HTML obiekt stanu `window.$_TSR` | Brak serwera backendowego – plik `index.html` musi sam zainicjować stan SPA |
+| **Hydracja Reacta** | Serwer backendowy wstrzykuje do HTML stan `window.$_TSR` z wyrenderowanym DOM | Wymaga wstępnego pre-renderingu SSR w build-time, aby nie było błędu #418 |
 | **Routing podstron** | Obsługiwany w locie przez silnik Nitro | Wymaga reguł `mod_rewrite` w pliku `.htaccess`, aby nie było błędu 404 po odświeżeniu |
 
 ---
@@ -43,12 +43,12 @@ Poniżej lista wszystkich problemów, na które natrafiliśmy, oraz ich bezpośr
 ### 2. Błąd `403 Forbidden` po pierwszym wdrożeniu na Smarthost
 * **Objaw**: Strona `https://twojadomena.smarthost.pl` zwraca błąd 403.
 * **Przyczyna**: Build z Lovable tworzył tylko pliki JS i CSS w folderze `.output/public/assets/`, ale **nie generował pliku `index.html`**. Apache przy braku `index.html` blokuje wyświetlanie folderu.
-* **Rozwiązanie**: Dodaliśmy lekki skrypt pomocniczy [`scripts/generate-html.js`](file:///c:/Users/adria/Documents/antigravity/mysterious-newton/scripts/generate-html.js), który po kompilacji generuje fizyczny `index.html`.
+* **Rozwiązanie**: Dodaliśmy skrypt pomocniczy [`scripts/generate-html.js`](file:///c:/Users/adria/Documents/antigravity/mysterious-newton/scripts/generate-html.js), który po kompilacji generuje fizyczny `index.html`.
 
 ### 3. Błąd `Invariant failed` w konsoli F12
 * **Objaw**: Biały ekran, w konsoli `Uncaught Error: Invariant failed at Te`.
 * **Przyczyna**: TanStack Router w trybie SSR oczekuje obiektu `window.$_TSR`. Przy wdrożeniu statycznym obiekt nie istniał.
-* **Rozwiązanie**: Wstrzyknęliśmy do nagłówka `index.html` startowy obiekt konfiguracji `window.$_TSR` w trybie SPA.
+* **Rozwiązanie**: Wstrzyknęliśmy startowy obiekt konfiguracji `window.$_TSR`.
 
 ### 4. Błąd `TypeError: window.$_TSR?.h is not a function`
 * **Objaw**: Biały ekran, błąd w skrypcie startowym.
@@ -67,21 +67,51 @@ Poniżej lista wszystkich problemów, na które natrafiliśmy, oraz ich bezpośr
 
 ### 7. Ostrzeżenie w konsoli `React error #418` (Hydration Mismatch)
 * **Objaw**: W konsoli deweloperskiej pojawia się `Minified React error #418`.
-* **Przyczyna**: Jest to standardowe ostrzeżenie Reacta informujące, że na wejściu plik HTML nie zawierał wstępnie wyrenderowanego drzewa DOM (ponieważ serwujemy plik statycznie).
-* **Wpływ na działanie**: **Brak wpływu (całkowicie bezpieczne)** – React natychmiast wykonuje tzw. *Client-Side Fallback* i w ułamku milisekundy samodzielnie buduje cały interfejs, nawigację i komponenty w przeglądarce.
+* **Przyczyna**: Plik HTML na serwerze był pustą powłoką, a kod Reacta oczekiwał wyrenderowanego drzewa DOM z nagłówkami.
+* **Rozwiązanie**: Zastosowaliśmy **prawdziwy pre-rendering SSR w build-time** w pliku `scripts/generate-html.js` – skrypt importuje wygenerowany bundle `.output/server/index.mjs` i renderuje pełny HTML dla wszystkich tras w trakcie budowania na GitHubie. Wynik: **0 błędów w konsoli**.
 
 ---
 
-## 📋 Instrukcja Krok po Kroku do wdrożenia w NOWYM / ISTNIEJĄCYM projekcie
+## 📋 Instrukcja Krok po Kroku do wdrożenia w DOWOLNYM projekcie
 
-Gdy chcesz podpiąć ten sam proces pod inny projekt, wykonaj poniższe kroki:
+Oto kompletna procedura wdrożeniowa do powtórzenia w innych projektach:
 
-### Krok 1: W Lovable (połączenie z GitHubem)
-1. Otwórz projekt w Lovable.
-2. Kliknij nazwę projektu w lewym górnym rogu ➔ **GitHub** (lub ikona GitHub).
-3. Kliknij **Connect to GitHub** i utwórz repozytorium (np. `https://github.com/TwojUser/nowy-projekt.git`).
+### KROK 0: Ciche sprawdzenie środowiska Git
+* Sprawdź dostępność `git` w systemie (`git --version`).
+* Jeśli brak w zmiennej PATH (częste na Windows), wykorzystaj wbudowany Git ze środowiska Visual Studio:
+  `C:\Program Files\Microsoft Visual Studio\...\Git\cmd\git.exe` lub zainstaluj przez `winget install --id Git.Git -e --source winget`.
 
-### Krok 2: W Smarthost (Konto FTP)
+### KROK 1: Podpięcie repozytorium w Lovable
+1. Otwórz projekt w [Lovable.dev](https://lovable.dev/).
+2. W lewym górnym rogu kliknij nazwę projektu ➔ **GitHub** (lub **Connect to GitHub**).
+3. Połącz swoje konto GitHub i utwórz repozytorium (np. `https://github.com/TwojLogin/nazwa-projektu.git`).
+4. Lovable automatycznie wyśle pierwszy stan projektu do gałęzi `main`.
+
+### KROK 2: Połączenie repozytorium z lokalnym Antigravity
+W terminalu przestrzeni roboczej Antigravity zainicjuj i pobierz repozytorium:
+```powershell
+git init
+git remote add origin https://github.com/TwojLogin/nazwa-projektu.git
+git fetch origin
+git checkout -B main origin/main
+git branch --set-upstream-to=origin/main main
+```
+Wszystkie pliki projektu (React, TanStack, Tailwind) pojawią się lokalnie w Twoim folderze roboczym.
+
+### KROK 3: Trwałe reguły w przestrzeni roboczej (`GEMINI.md` / `AGENTS.md`)
+Zapisz plik konfiguracyjny reguł w katalogu projektu, aby każdy agent AI znał powiązanie:
+```markdown
+# Lovable Project Integration
+- **Project URL**: https://lovable.dev/projects/<ID_PROJEKTU>
+- **Repository**: https://github.com/TwojLogin/nazwa-projektu
+- **Zasada**: Wszelkie zmiany w kodzie wypychamy do gałęzi `main`.
+```
+
+### KROK 4: Weryfikacja dwukierunkowej synchronizacji
+1. **Lokalnie ➔ Lovable**: Zmodyfikuj plik (np. dodaj baner w `src/routes/index.tsx`), wykonaj commit i `git push origin main`. W Lovable podgląd natychmiast się zaktualizuje.
+2. **Lovable ➔ Lokalnie**: Wpisz prompt w Lovable (np. *"Zmień nagłówek"*). Po wygenerowaniu wykonaj `git pull origin main` w Antigravity – nowy kod pojawi się w edytorze.
+
+### KROK 5: Utworzenie konta FTP na Smarthost
 1. Zaloguj się do cPanelu Smarthost.
 2. Wejdź w **Pliki ➔ Konta FTP**.
 3. Utwórz konto:
@@ -89,14 +119,14 @@ Gdy chcesz podpiąć ten sam proces pod inny projekt, wykonaj poniższe kroki:
    - **Hasło**: Silne, wygenerowane hasło
    - **Katalog**: Koniecznie zmień na samo `public_html` (lub `public_html/twojadomena.pl`)!
 
-### Krok 3: W GitHubie (Sekrety repozytorium)
-1. W repozytorium wejdź w: **Settings ➔ Secrets and variables ➔ Actions**.
+### KROK 6: Konfiguracja GitHub Secrets
+1. W repozytorium na GitHubie wejdź w: **Settings ➔ Secrets and variables ➔ Actions**.
 2. Dodaj 3 sekrety (**New repository secret**):
    - `FTP_SERVER`: adres serwera (np. `s61.smarthost.pl`)
    - `FTP_USERNAME`: pełny login z małpą (np. `deploy@twojadomena.smarthost.pl`)
    - `FTP_PASSWORD`: hasło do konta FTP
 
-### Krok 4: Skopiuj 3 kluczowe pliki do projektu
+### KROK 7: Skopiuj 3 kluczowe pliki do projektu
 
 #### 📄 1. Plik `scripts/generate-html.js`
 Utwórz katalog `scripts/` i plik `generate-html.js`:
@@ -219,7 +249,43 @@ jobs:
           dangerous-clean-slate: false
 ```
 
-### Krok 5: Push i gotowe!
-Wypchnij te pliki do GitHuba (`git push origin main`). Od tej pory:
+### KROK 8: Push i pełna automatyzacja!
+Wypchnij te pliki do GitHuba (`git add .`, `git commit -m "Setup deployment"`, `git push origin main`). Od tej pory:
 - Każda zmiana zrobiona w **Lovable** automatycznie kompiluje się i publikuje na **Smarthost**.
 - Każda zmiana zrobiona lokalnie w **Antigravity** natychmiast synchronizuje się z **Lovable** i **Smarthostem**.
+
+---
+
+## 🔵 Alternatywne Obejście: Playwright MCP (Sterowanie przeglądarką)
+> **Zastosowanie**: Gdy chcesz, aby AI w Antigravity mogło samo klikać i wpisywać prompty w panelu Lovable w Twoim imieniu bez używania oficjalnego API.
+
+### KROK 0: Ciche sprawdzenie Node.js
+- Sprawdź komendy `node -v` oraz `npx -v`. Jeśli brak, zainstaluj z [nodejs.org](https://nodejs.org).
+
+### KROK 1: Wybór projektu i przeglądarki
+- Podaj adres URL projektu Lovable (np. `https://lovable.dev/projects/...`) oraz wybierz przeglądarkę (Chrome / Edge).
+
+### KROK 2: Weryfikacja zalogowania
+- Upewnij się, że jesteś zalogowany w wybranej przeglądarce i masz otwarty projekt.
+
+### KROK 3: Konfiguracja MCP i profilu
+- Zapisz w `~/.gemini/config/mcp_config.json`:
+  ```json
+  {
+    "mcpServers": {
+      "playwright": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@playwright/mcp@latest",
+          "--browser", "chrome",
+          "--user-data-dir", "C:/Users/<user>/.gemini/playwright_profile"
+        ]
+      }
+    }
+  }
+  ```
+- Skopiuj ciasteczka (`Network/Cookies`, `Local Storage`) z `%LOCALAPPDATA%\Google\Chrome\User Data` do `%USERPROFILE%/.gemini/playwright_profile/Default/`.
+
+### KROK 4: Test połączenia
+- Otwórz URL projektu, sprawdź czy pole *"Ask Lovable..."* jest aktywne i wykonaj zrzut ekranu.
