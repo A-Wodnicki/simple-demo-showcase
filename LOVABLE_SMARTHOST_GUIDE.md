@@ -255,3 +255,30 @@ Wypchnij te pliki do GitHuba (`git add .`, `git commit -m "Setup deployment"`, `
 - Każda zmiana zrobiona lokalnie w **Antigravity** natychmiast synchronizuje się z **Lovable** i **Smarthostem**.
 - Strona na hostingu działa w 100% płynnie, szybko i z **0 błędami w konsoli F12**!
 
+---
+
+## 🔄 Rotacja Workspace'ów w Lovable (Gdy kończą się kredyty)
+
+> **Oficjalne stanowisko Lovable Support**: Przeniesienie projektu między Workspace'ami w Lovable **zawsze zrywa połączenie z GitHubem**, a ponowne połączenie w nowym Workspace **zawsze wymusza utworzenie nowego repozytorium**. Nie ma możliwości bezpośredniego podpięcia pod istniejące repozytorium z poziomu panelu Lovable.
+
+### 💡 Jak to sprytnie ograć w zespole bez psucia głównego repozytorium i CI/CD:
+
+Dzięki **Antigravity jako centralnemu repozytorium (Single Source of Truth)**, Twój główny GitHub i wdrożenie na Smarthost (`simple-demo-showcase`) pozostają **stałe i nienaruszone**.
+
+Gdy w starym Workspace skończą się kredyty i tworzycie projekt w nowym Workspace:
+
+1. **W nowym Workspace Lovable:** Tworzycie projekt i klikacie *Connect to GitHub* (Lovable stworzy nowe, tymczasowe repo, np. `projekt-temp`).
+2. **W Antigravity (lokalnie):** Wypychacie dotychczasowy kod do nowego tymczasowego repozytorium:
+   ```bash
+   git remote add temp-lovable https://github.com/TwojLogin/projekt-temp.git
+   git push -u temp-lovable main --force
+   ```
+3. **Generowanie w Lovable:** Nowy projekt w Lovable natychmiast załaduje 100% dotychczasowej aplikacji i korzysta ze świeżych kredytów.
+4. **Pobranie i publikacja:** Po skończeniu pracy w Lovable ściągacie zmiany do Antigravity i wysyłacie do głównego repozytorium:
+   ```bash
+   git pull temp-lovable main
+   git push origin main
+   ```
+5. **Wynik:** Strona produkcyjna na Smarthost natychmiast się aktualizuje, a Wy nie musieliście przepinać sekretów, domen ani pipeline'ów CI/CD!
+
+
