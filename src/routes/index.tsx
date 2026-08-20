@@ -54,11 +54,12 @@ function Home() {
         </div>
       </section>
 
-      <section className="grid gap-6 sm:grid-cols-3">
+      <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { t: "Świeżość", d: "Palimy dwa razy w tygodniu, sprzedajemy do 21 dni od wypału." },
           { t: "Pochodzenie", d: "Kupujemy bezpośrednio od farm w Etiopii, Kolumbii i Peru." },
           { t: "Spokój", d: "Bez muzyki po 18:00. Dużo gniazdek, wolne stoliki i cisza." },
+          { t: "Rzemiosło", d: "Każdą filiżankę parzymy z wagą i timerem — powtarzalnie i precyzyjnie." },
         ].map((c) => (
           <div key={c.t} className="rounded-2xl border border-border bg-card p-6">
             <h2 className="text-lg font-medium">{c.t}</h2>
