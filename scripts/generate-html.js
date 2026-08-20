@@ -20,6 +20,7 @@ if (fs.existsSync(assetsDir)) {
     ${cssFile ? `<link rel="stylesheet" href="/assets/${cssFile}">` : ''}
     <script>
       window.$_TSR = {
+        h: function() {},
         buffer: [],
         initialized: false,
         router: {
