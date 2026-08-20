@@ -10,8 +10,8 @@ if (fs.existsSync(assetsDir)) {
   const jsFile = files.find((f) => f.startsWith('index') && f.endsWith('.js'));
 
   const html = `<!DOCTYPE html>
-<html lang="pl">
-  <head>
+<html lang="pl" suppressHydrationWarning>
+  <head suppressHydrationWarning>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kawiarnia Nocna — Palarnia kawy w Warszawie</title>
@@ -36,7 +36,7 @@ if (fs.existsSync(assetsDir)) {
       };
     </script>
   </head>
-  <body>
+  <body suppressHydrationWarning>
     ${jsFile ? `<script type="module" src="/assets/${jsFile}"></script>` : ''}
   </body>
 </html>`;
