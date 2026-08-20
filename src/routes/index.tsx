@@ -33,7 +33,7 @@ function Home() {
           Palarnia specialty · Warszawa
         </p>
         <h1 className="max-w-3xl text-5xl font-semibold leading-tight tracking-tight sm:text-6xl">
-          Kawa palona nocą, parzona z pasją.
+          Śpimy krótko, żebyś Ty nie musiał.
         </h1>
         <p className="max-w-xl text-lg text-muted-foreground">
           Małe partie, jasne palenie i menu, które zmienia się razem z sezonem zbiorów.
