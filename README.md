@@ -18,11 +18,14 @@ Ten projekt powstał jako praktyczny test architektury łączącej tworzenie UI 
 
 ## 🔄 Test Obejścia Rotacji Workspace'ów (Multi-Workspace Bypass)
 
-W ramach tego projektu przetestowaliśmy i wdrożyliśmy rozwiązanie na znane ograniczenie Lovable (brak możliwości przepięcia pod istniejące repo przy zmianie workspace/konta):
+W ramach tego projektu przetestowaliśmy i wdrożyliśmy rozwiązanie na znane ograniczenie platformy Lovable (brak możliwości przepięcia pod istniejące repo przy zmianie workspace/konta):
 
-* **Repozytorium Główne (Produkcja)**: `A-Wodnicki/simple-demo-showcase` – posiada skonfigurowane sekrety FTP i automatyczny deploy na Smarthost.
-* **Repozytorium Tymczasowe (Piaskownica Lovable)**: `A-Wodnicki/tiny-showcase` – podpięte pod nowy projekt w Lovable ze świeżą pulą darmowych kredytów AI.
-* **Zasada działania**: Kod synchronizujemy lokalnie w Antigravity za pomocą dodatkowego remote (`temp-lovable`). Dzięki temu **nie trzeba dodawać sekretów ani konfigurować hostingu od nowa** w żadnym nowo tworzonym projekcie Lovable!
+| Repozytorium | Rola w ekosystemie | Link do GitHuba | Status CI/CD & Hosting |
+| :--- | :--- | :--- | :--- |
+| 👑 **Główne (Produkcja)** | Centralne źródło prawdy, stała historia | [🔗 `A-Wodnicki/simple-demo-showcase`](https://github.com/A-Wodnicki/simple-demo-showcase) | ✅ Posiada sekrety FTP ➔ Deploy na Smarthost |
+| 🧪 **Tymczasowe (Sandbox)** | Generator Lovable (świeża pula kredytów) | [🔗 `A-Wodnicki/tiny-showcase`](https://github.com/A-Wodnicki/tiny-showcase) | ⚡ Bez konfiguracji sekretów i hostingu |
+
+* **Zasada działania**: Kod synchronizujemy lokalnie w Antigravity za pomocą dwóch remote'ów (`origin` oraz `temp-lovable`). Dzięki temu **nie trzeba dodawać sekretów ani konfigurować hostingu od nowa** w żadnym nowym projekcie Lovable!
 
 ---
 
