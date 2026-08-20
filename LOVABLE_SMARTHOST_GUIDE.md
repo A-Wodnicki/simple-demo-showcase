@@ -103,49 +103,53 @@ Utwórz katalog `scripts/` i plik `generate-html.js`:
 ```javascript
 import fs from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
-const publicDir = path.resolve('.output/public');
-const assetsDir = path.join(publicDir, 'assets');
+async function generatePrerenderedHTML() {
+  const publicDir = path.resolve('.output/public');
+  const serverPath = path.resolve('.output/server/index.mjs');
 
-if (fs.existsSync(assetsDir)) {
-  const files = fs.readdirSync(assetsDir);
-  const cssFile = files.find((f) => f.startsWith('styles') && f.endsWith('.css'));
-  const jsFile = files.find((f) => f.startsWith('index') && f.endsWith('.js'));
+  if (!fs.existsSync(serverPath)) {
+    console.warn('⚠️ Server entry not found at .output/server/index.mjs');
+    return;
+  }
 
-  const html = `<!DOCTYPE html>
-<html lang="pl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Aplikacja WWW</title>
-    <link rel="icon" href="/favicon.ico" />
-    ${cssFile ? `<link rel="stylesheet" href="/assets/${cssFile}">` : ''}
-    <script>
-      window.$_TSR = {
-        h: function() {},
-        buffer: [],
-        initialized: false,
-        router: {
-          matches: [
-            { i: '__root__', s: 'success', ssr: false }
-          ],
-          lastMatchId: null,
-          manifest: {
-            routes: {}
-          },
-          dehydratedData: {}
+  const serverUrl = pathToFileURL(serverPath).href;
+  const server = await import(serverUrl);
+  const handler = server.default;
+  const env = { ASSETS: { fetch: () => new Response(null, { status: 404 }) } };
+  const context = { waitUntil: () => {} };
+
+  // Lista podstron do wyrenderowania
+  const routes = ['/', '/menu', '/o-nas', '/kontakt'];
+
+  for (const route of routes) {
+    try {
+      const res = await handler.fetch(new Request(`http://localhost${route}`), env, context);
+      if (res.status === 200) {
+        const html = await res.text();
+
+        if (route === '/') {
+          fs.writeFileSync(path.join(publicDir, 'index.html'), html, 'utf-8');
+          console.log('✅ Wygenerowano pre-renderowany .output/public/index.html');
+        } else {
+          const cleanRoute = route.replace(/^\//, '');
+          const routeDir = path.join(publicDir, cleanRoute);
+          if (!fs.existsSync(routeDir)) {
+            fs.mkdirSync(routeDir, { recursive: true });
+          }
+          fs.writeFileSync(path.join(publicDir, `${cleanRoute}.html`), html, 'utf-8');
+          fs.writeFileSync(path.join(routeDir, 'index.html'), html, 'utf-8');
+          console.log(`✅ Wygenerowano pre-renderowany ${route} -> ${cleanRoute}.html & ${cleanRoute}/index.html`);
         }
-      };
-    </script>
-  </head>
-  <body>
-    ${jsFile ? `<script type="module" src="/assets/${jsFile}"></script>` : ''}
-  </body>
-</html>`;
-
-  fs.writeFileSync(path.join(publicDir, 'index.html'), html, 'utf-8');
-  console.log('✅ Generated .output/public/index.html with CSS:', cssFile, 'and JS:', jsFile);
+      }
+    } catch (err) {
+      console.error(`❌ Błąd przy generowaniu trasy ${route}:`, err);
+    }
+  }
 }
+
+generatePrerenderedHTML().catch(console.error);
 ```
 
 #### 📄 2. Plik `public/.htaccess`
