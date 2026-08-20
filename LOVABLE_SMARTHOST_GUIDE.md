@@ -251,41 +251,7 @@ jobs:
 
 ### KROK 8: Push i pełna automatyzacja!
 Wypchnij te pliki do GitHuba (`git add .`, `git commit -m "Setup deployment"`, `git push origin main`). Od tej pory:
-- Każda zmiana zrobiona w **Lovable** automatycznie kompiluje się i publikuje na **Smarthost**.
+- Każda zmiana zrobiona w **Lovable** automatycznie kompiluje się, generuje pre-renderowane pliki HTML (bez błędu hydracji React #418) i publikuje na **Smarthost**.
 - Każda zmiana zrobiona lokalnie w **Antigravity** natychmiast synchronizuje się z **Lovable** i **Smarthostem**.
+- Strona na hostingu działa w 100% płynnie, szybko i z **0 błędami w konsoli F12**!
 
----
-
-## 🔵 Alternatywne Obejście: Playwright MCP (Sterowanie przeglądarką)
-> **Zastosowanie**: Gdy chcesz, aby AI w Antigravity mogło samo klikać i wpisywać prompty w panelu Lovable w Twoim imieniu bez używania oficjalnego API.
-
-### KROK 0: Ciche sprawdzenie Node.js
-- Sprawdź komendy `node -v` oraz `npx -v`. Jeśli brak, zainstaluj z [nodejs.org](https://nodejs.org).
-
-### KROK 1: Wybór projektu i przeglądarki
-- Podaj adres URL projektu Lovable (np. `https://lovable.dev/projects/...`) oraz wybierz przeglądarkę (Chrome / Edge).
-
-### KROK 2: Weryfikacja zalogowania
-- Upewnij się, że jesteś zalogowany w wybranej przeglądarce i masz otwarty projekt.
-
-### KROK 3: Konfiguracja MCP i profilu
-- Zapisz w `~/.gemini/config/mcp_config.json`:
-  ```json
-  {
-    "mcpServers": {
-      "playwright": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@playwright/mcp@latest",
-          "--browser", "chrome",
-          "--user-data-dir", "C:/Users/<user>/.gemini/playwright_profile"
-        ]
-      }
-    }
-  }
-  ```
-- Skopiuj ciasteczka (`Network/Cookies`, `Local Storage`) z `%LOCALAPPDATA%\Google\Chrome\User Data` do `%USERPROFILE%/.gemini/playwright_profile/Default/`.
-
-### KROK 4: Test połączenia
-- Otwórz URL projektu, sprawdź czy pole *"Ask Lovable..."* jest aktywne i wykonaj zrzut ekranu.
