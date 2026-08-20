@@ -23,6 +23,11 @@ function Home() {
   return (
     <div className="space-y-16">
       <section className="space-y-6">
+        <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shadow-sm animate-pulse">
+          <span>☕ PROMOCJA DNIA</span>
+          <span className="text-muted-foreground">·</span>
+          <span>-20% na wszystkie kawy specialty z kodem <strong>NOCNA20</strong></span>
+        </div>
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
           Palarnia specialty · Warszawa
         </p>
