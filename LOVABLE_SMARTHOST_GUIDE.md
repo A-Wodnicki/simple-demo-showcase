@@ -65,6 +65,11 @@ Poniżej lista wszystkich problemów, na które natrafiliśmy, oraz ich bezpośr
 * **Przyczyna**: Apache szuka fizycznego katalogu `/menu/index.html`, który nie istnieje w aplikacji SPA.
 * **Rozwiązanie**: Dodaliśmy plik [`public/.htaccess`](file:///c:/Users/adria/Documents/antigravity/mysterious-newton/public/.htaccess) przekierowujący wszystkie zapytania do głównego `index.html`.
 
+### 7. Ostrzeżenie w konsoli `React error #418` (Hydration Mismatch)
+* **Objaw**: W konsoli deweloperskiej pojawia się `Minified React error #418`.
+* **Przyczyna**: Jest to standardowe ostrzeżenie Reacta informujące, że na wejściu plik HTML nie zawierał wstępnie wyrenderowanego drzewa DOM (ponieważ serwujemy plik statycznie).
+* **Wpływ na działanie**: **Brak wpływu (całkowicie bezpieczne)** – React natychmiast wykonuje tzw. *Client-Side Fallback* i w ułamku milisekundy samodzielnie buduje cały interfejs, nawigację i komponenty w przeglądarce.
+
 ---
 
 ## 📋 Instrukcja Krok po Kroku do wdrożenia w NOWYM / ISTNIEJĄCYM projekcie
