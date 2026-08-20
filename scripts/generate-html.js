@@ -28,7 +28,9 @@ if (fs.existsSync(assetsDir)) {
             { i: '__root__', s: 'success', ssr: false }
           ],
           lastMatchId: null,
-          manifest: {},
+          manifest: {
+            routes: {}
+          },
           dehydratedData: {}
         }
       };
