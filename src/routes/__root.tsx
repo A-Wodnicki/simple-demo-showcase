@@ -114,13 +114,50 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const NAV = [
+  { to: "/", label: "Start" },
+  { to: "/menu", label: "Menu" },
+  { to: "/o-nas", label: "O nas" },
+  { to: "/kontakt", label: "Kontakt" },
+] as const;
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
+        <header className="border-b border-border">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-5">
+            <Link to="/" className="text-sm font-semibold tracking-[0.2em] uppercase">
+              Kawiarnia Nocna
+            </Link>
+            <nav className="flex gap-6 text-sm text-muted-foreground">
+              {NAV.map((n) => (
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  activeOptions={{ exact: n.to === "/" }}
+                  activeProps={{ className: "text-foreground font-medium" }}
+                  className="transition-colors hover:text-foreground"
+                >
+                  {n.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </header>
+        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </main>
+        <footer className="border-t border-border">
+          <div className="mx-auto max-w-5xl px-6 py-6 text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Kawiarnia Nocna · Wilcza 42, Warszawa
+          </div>
+        </footer>
+      </div>
     </QueryClientProvider>
   );
 }
+
